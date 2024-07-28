@@ -1,0 +1,93 @@
+<template>    
+    <div class="contaner_cortina">
+        <div class="title_cortina">Cortina {{value}}%</div>
+        <div class="buttons_cortina">
+            <v-btn class="button_cortina" @click="close">        
+                <v-icon class="icon_cortina" ref="close">mdi-curtains-closed</v-icon>
+            </v-btn>
+            <v-btn class="button_cortina" @click="stop">
+                <v-icon class="icon_cortina" ref="stop">mdi-pause-octagon-outline</v-icon>
+            </v-btn>
+            <v-btn class="button_cortina" @click="open">
+                <v-icon class="icon_cortina" ref="open">mdi-curtains</v-icon>
+            </v-btn>
+        </div>
+    </div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                value: ''
+            };
+        },
+        mounted() {            
+            this.$socket.on('widget-load:' + this.id, (msg) => {
+                this.value = msg.payload.position;
+            });
+        },
+        methods: {
+            open() {
+                this.$refs.open.$el.style.color = '#BD9608';
+                this.$refs.open.$el.style.textShadow = '0px 0px 10px #BD9608';
+                setTimeout(() => {
+                    this.$refs.open.$el.style.color = '#A9A9A9';
+                    this.$refs.open.$el.style.textShadow = '0px 0px 0px #A9A9A9';
+                }, 200);       
+                this.send({ payload: 'open' });
+            },
+            close() {
+                this.$refs.close.$el.style.color = '#BD9608';
+                this.$refs.close.$el.style.textShadow = '0px 0px 10px #BD9608';
+                setTimeout(() => {
+                    this.$refs.close.$el.style.color = '#A9A9A9';
+                    this.$refs.close.$el.style.textShadow = '0px 0px 0px #A9A9A9';
+                }, 200);
+                this.send({ payload: 'close' });
+            },
+            stop() {
+                this.$refs.stop.$el.style.color = '#BD9608';
+                this.$refs.stop.$el.style.textShadow = '0px 0px 10px #BD9608'; 
+                setTimeout(() => {
+                    this.$refs.stop.$el.style.color = '#A9A9A9';
+                    this.$refs.stop.$el.style.textShadow = '0px 0px 0px #A9A9A9';
+                }, 200);
+                this.send({ payload: 'stop' });
+            }
+        },
+        watch: {
+            msg: function(msg) {
+                this.value = msg.payload.position;
+            }
+        }
+    }
+</script>
+
+<style>
+    .contaner_cortina {
+        display: flex; 
+        margin: auto; 
+        flex-direction: column; 
+        height: 75px; 
+        width: 225px; 
+        background-color: #4F4F4F; 
+        border: 1px solid #000000; 
+        border-radius: 18px;
+    }
+    .buttons_cortina {         
+        margin: auto;
+        flex-direction: row;         
+    }
+    .button_cortina {         
+        margin: auto;
+        background-color: transparent;
+    }
+    .title_cortina {
+        margin: auto;
+        font-size: 14px;
+    }
+    .icon_cortina {
+        font-size: 30px; 
+    }
+</style>
