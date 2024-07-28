@@ -1,0 +1,133 @@
+<template>
+    <div class="card_luminaria">
+        <div class="title_luminaria">Luminária</div>
+        <v-icon class="icon_luminaria" @click="alternar" ref="icon">mdi-track-light</v-icon>
+        <v-slider 
+            class="barra_luminaria" 
+            :max="254" 
+            :min="0" 
+            :step="1" 
+            thumb-label 
+            :thumb-size="10"
+            color="#BD9608"
+            :track-size="3"
+            v-model="state_barra" 
+            @click="barra">
+        </v-slider>
+    </div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                state: '',
+                state_barra: 0
+            };
+        },
+        mounted() {            
+            this.$socket.on('widget-load:' + this.id, (msg) => {
+                this.state = msg.payload.state;
+                this.state_barra = msg.payload.brightness;
+                if (this.state === "ON") {
+                    this.state_barra = msg.payload.brightness;
+                    this.on_status();
+                } else {
+                    this.state_barra = 0;
+                    this.off_status();
+                }
+            });
+        },
+        methods: {
+            alternar() {
+                if (this.state === 'ON') {
+                    this.state_barra = 0;                    
+                    this.off();
+                } else {
+                    this.state_barra = 254;                    
+                    this.on();
+                }
+            },
+            barra() {
+                if (this.state_barra >= 1) {
+                    this.$refs.icon.$el.style.color = '#BD9608';
+                    this.$refs.icon.$el.style.textShadow = `0px 0px 10px rgba(189, 150, 11, ${this.state_barra / 254})`;
+                    this.send({ payload: {state: "ON", brightness: parseInt(this.state_barra)}});
+                    this.state = "ON";
+                } else {
+                    this.$refs.icon.$el.style.color = '#A9A9A9';
+                    this.$refs.icon.$el.style.textShadow = '0px 0px 0px';
+                    this.send({ payload: { state: "OFF", brightness: 0}});
+                    this.state = "OFF";
+                }                
+            },
+            on() {
+                this.$refs.icon.$el.style.color = '#BD9608';
+                this.$refs.icon.$el.style.textShadow = `0px 0px 10px rgba(189, 150, 11, ${this.state_barra / 254})`;
+                if (this.state === 'OFF') {
+                    this.send({ payload: {state: "ON", brightness: parseInt(this.state_barra)}});
+                }
+                this.state = "ON";
+            },
+            off() {
+                this.$refs.icon.$el.style.color = '#A9A9A9';
+                this.$refs.icon.$el.style.textShadow = '0px 0px 0px';
+                if (this.state === 'ON') {
+                    this.send({ payload: { state: "OFF", brightness: 0}});
+                }
+                this.state = "OFF";
+            },
+            on_status() {
+                this.$refs.icon.$el.style.color = '#BD9608';
+                this.$refs.icon.$el.style.textShadow = `0px 0px 10px rgba(189, 150, 11, ${this.state_barra / 254})`;
+                this.state = "ON";
+            },
+            off_status() {
+                this.$refs.icon.$el.style.color = '#A9A9A9';
+                this.$refs.icon.$el.style.textShadow = '0px 0px 0px';
+                this.state = "OFF";
+            }
+        },
+        watch: {
+            msg: function() {
+                if (this.msg.payload === "ON") {
+                    if (this.state === "OFF") {
+                        this.state_barra = 254;
+                        this.on_status();
+                    }
+                } else if (this.msg.payload === "OFF") {
+                    if (this.state === "ON") {
+                        this.state_barra = 0;
+                        this.off_status();
+                    }
+                }
+            }
+        }
+    }
+</script>
+
+<style>
+    .card_luminaria {
+        display: flex;
+        margin: auto;
+        flex-direction: column;
+        height: 90px;
+        width: 70px;
+        border: 1px solid #000000;
+        border-radius: 12px;
+        background-color: #4F4F4F;
+        color: #000000;
+    }
+    .title_luminaria {
+        margin: 3px auto 0px auto;
+        font-size: 85%;
+    }
+    .icon_luminaria {
+        margin: 5px auto 0px auto;
+        font-size: 350%;
+    }
+    .barra_luminaria {
+        margin: -10px auto 0px auto;
+        width: 50px;
+    }
+</style>
