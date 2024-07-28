@@ -1,0 +1,81 @@
+<template>
+    <div class="contaner_quarto">
+        <div class="title_quarto">Quarto</div>
+        <v-icon class="icon_quarto" ref="icon" @click="alternar" color="#A9A9A9">mdi-bed</v-icon>
+    </div>
+</template>
+
+<script>
+    export default {
+        data() {
+            return {
+                value: ''
+            };
+        },
+        methods: {
+            alternar() {
+                if (this.value === 'ON') {
+                    this.off_alternar();                       
+                } else {
+                    this.on_alternar();                      
+                }
+            },
+            on_alternar() {
+                this.$refs.icon.$el.style.color = '#BD9608';
+                this.$refs.icon.$el.style.textShadow = '0px 0px 10px #BD9608';
+                this.value = "ON";
+                this.send({ payload: "ON" });
+            },
+            off_alternar() {
+                this.$refs.icon.$el.style.color = '#A9A9A9';
+                this.$refs.icon.$el.style.textShadow = '0px 0px 0px';
+                this.value = "OFF";
+                this.send({ payload: "OFF" });
+            },
+            on() {
+                this.$refs.icon.$el.style.color = '#BD9608';
+                this.$refs.icon.$el.style.textShadow = '0px 0px 10px #BD9608';
+                this.value = "ON";
+            },
+            off() {
+                this.$refs.icon.$el.style.color = '#A9A9A9';
+                this.$refs.icon.$el.style.textShadow = '0px 0px 0px';
+                this.value = "OFF";
+            }
+        },
+        watch: {
+            msg: function() {
+                if (this.msg.payload === "ON") {
+                    this.on();
+                } else {
+                    this.off();   
+                }                        
+            }
+        }
+    }
+</script>
+
+<style>
+    .contaner_quarto {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        height: 70px !important;
+        width: 70px !important;
+        background-color: #4F4F4F;
+        color: #000000;
+        border: 1px solid #000000;
+        font-size: 14px;
+        border-radius: 18px;
+    }
+
+    .title_quarto {
+        margin: 5px auto auto auto;
+        font-size: 85%;
+    }
+
+    .icon_quarto {
+        margin: -7px auto auto auto;
+        font-size: 300%;
+    }
+</style>
